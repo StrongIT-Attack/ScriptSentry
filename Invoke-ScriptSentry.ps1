@@ -1408,7 +1408,7 @@ function Find-UnsafeUNCPermissions {
     $SafeUsers = $SafeUsersList
     foreach ($script in $UNCScripts){
         # "Checking $script for unsafe permissions.."
-        $ACL = (Get-Acl $script -ErrorAction SilentlyContinue).Access
+        $ACL = try { (Get-Acl $script -ErrorAction SilentlyContinue).Access } catch{}
         foreach ($entry in $ACL) {
             if ($entry.FileSystemRights -match $UnsafeRights `
                 -and $entry.AccessControlType -eq "Allow" `
@@ -1536,7 +1536,7 @@ function Show-Results {
 
 Get-Art -Version '0.6'
 
-$SafeUsers = 'NT AUTHORITY\\SYSTEM|Administrator|NT SERVICE\\TrustedInstaller|Domain Admins|Server Operators|Enterprise Admins|CREATOR OWNER'
+$SafeUsers = 'NT-?AUTH?ORIT..\\SYSTEM|Administrator|NT SERVICE\\TrustedInstaller|Domänen-Admins|Domain Admins|Server Operators|Organisations-Admins|Enterprise Admins|CREATOR OWNER|ERSTELLER BESITZER'
 $AdminGroups = @("Account Operators", "Administrators", "Backup Operators", "Cryptographic Operators", "Distributed COM Users", "Domain Admins", "Domain Controllers", "Enterprise Admins", "Print Operators", "Schema Admins", "Server Operators")
 $AdminUsers = $AdminGroups | ForEach-Object { (Get-DomainGroupMember -Identity $_ -Recurse | Where-Object {$_.MemberObjectClass -eq 'user'})} | Sort-Object -Property MemberName -Unique
 $AdminUsers | ForEach-Object { $SafeUsers = $SafeUsers + '|' + $_.MemberName }
